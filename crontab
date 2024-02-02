@@ -1,0 +1,1 @@
+*/5 * * * * /home/rocky/rabbitmq-solr-health-checks/bin/query-health-checks.rb

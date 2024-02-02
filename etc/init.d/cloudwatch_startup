@@ -1,0 +1,66 @@
+#!/bin/sh
+###
+### /etc/init.d/cloudwatch_startup - Demo Cloudwatch Agent Startup Script
+###
+
+# chkconfig: 2345 99 01
+# description: Demo Cloudwatch Agent Startup Script
+
+# description: cloudwatch_startup is a custom process which handles starting \
+#              and stopping of the cloudwatch agent to log cantaloupe health \
+#              check information 
+
+### BEGIN INIT INFO
+# Provides: cloudwatch_startup
+# Required-Start: $local_fs $network
+# Required-Stop: $local_fs $network
+# Short-Description: Start/Stop cloudwatch agent
+# Description: cloudwatch_startup is a custom process which handles starting
+#              and stopping of the cloudwatch agent to log cantaloupe health
+#              check information 
+### END INIT INFO
+
+# source the function library
+. /etc/init.d/functions
+
+SVC_USER="rocky";
+AGENT_DIR="/home/${SVC_USER}"
+RETVAL=0
+
+start() {
+    /bin/su $SVC_USER -c "sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:$AGENT_DIR/amazon-cloudwatch-agent.json" 
+}
+
+stop() {
+    /bin/su $SVC_USER -c "sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -m ec2 -a stop"
+}
+
+status() {
+	/bin/su $SVC_USER -c "sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -m ec2 -a status"
+}
+
+# See how we were called.
+case "$1" in
+  start)
+    start
+    ;;
+  
+  stop)
+    stop
+    ;;
+
+  status)
+	status
+	;;
+
+  restart)
+    stop
+    start
+    ;;
+
+  *)
+    echo $"Usage: $prog {start|stop|restart|status}"
+esac
+
+exit 0
+
