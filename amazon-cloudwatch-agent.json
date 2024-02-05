@@ -12,7 +12,6 @@
             "log_group_name": "rabbitmq-solr-demo-health-check-log",
             "log_stream_name": "rabbitmq-solr-demo-health-check-log-stream",
             "timezone": "Local",
-            "retention_in_days": 3
           }
         ]
       }
