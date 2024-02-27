@@ -4,19 +4,22 @@ require 'logger'
 require 'json'
 
 ACTIVE = "active"
-HTTP_OK = "200"
+INACTIVE = "inactive"
+SOLR_STOPPED = "No Solr nodes are running."
 
 logger = Logger.new('/home/rocky/log/health-checks/health_check_status.log', 1, 500000)
 
 instance_id = File.open('/var/lib/cloud/data/instance-id', &:readline).strip
 
-rabbitmq_status = `systemctl is-active rabbitmq-server`.strip
-rabbitmq_is_active = rabbitmq_status == ACTIVE
+rabbitmq_system_status = `systemctl is-active rabbitmq-server`.strip
+rabbitmq_is_active = rabbitmq_system_status == ACTIVE
 
-solr_uri = URI('http://localhost:8983/solr/admin/cores?action=STATUS')
-solr_response_code = Net::HTTP.get_response(solr_uri).code
-solr_status = `systemctl is-active solr.service`.strip
-solr_is_active = (solr_status == ACTIVE and solr_response_code == HTTP_OK)
+solr_bin_status = `/opt/solr/bin/solr status`.strip.split("\n").first
+solr_bin_status_active = (solr_bin_status != SOLR_STOPPED)
+solr_system_status = `systemctl is-active solr.service`.strip
+solr_system_status_active = solr_system_status == ACTIVE
+solr_is_active = (solr_system_status_active and solr_bin_status_active)
+solr_status = solr_is_active ? ACTIVE : INACTIVE
 
-status_log = {"InstanceId" => instance_id, "rabbitmq_status" => rabbitmq_status, "solr_status" => solr_status}.to_json
+status_log = {"InstanceId" => instance_id, "rabbitmq_status" => rabbitmq_system_status, "solr_status" => solr_status}.to_json
 rabbitmq_is_active and solr_is_active ? logger.info(status_log) : logger.error(status_log)
