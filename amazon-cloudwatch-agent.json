@@ -17,5 +17,17 @@
       }
     },
     "log_stream_name": "rabbitmq_solr_health_check_status"
+  },
+  "metrics": {
+    "append_dimensions": {
+      "InstanceId":"${aws:InstanceId}"
+    },
+    "metrics_collected": {
+      "mem": {
+        "measurement": [
+          "available_percent"
+        ]
+      }
+    }
   }
 }
