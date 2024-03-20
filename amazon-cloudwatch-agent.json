@@ -23,8 +23,8 @@
       "InstanceId":"${aws:InstanceId}"
     },
     "metrics_collected": {
-      "metrics_collection_interval": 60,
       "mem": {
+        "metrics_collection_interval": 60,
         "measurement": [
           "available_percent"
         ]
